@@ -20,7 +20,7 @@ const SignInPage: FC = function () {
             className="mx-auto h-12"
           />
           <h1 className="mt-4 text-2xl font-bold dark:text-white md:text-3xl">
-            Sign in to platform
+            Sign In
           </h1>
         </div>
         <form>
@@ -51,7 +51,7 @@ const SignInPage: FC = function () {
               href="#"
               className="text-sm text-primary-600 dark:text-primary-300"
             >
-              Lost Password?
+              Forgot Password?
             </a>
           </div>
           <div className="mb-6">
