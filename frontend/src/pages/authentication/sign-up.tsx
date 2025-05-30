@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Button, Label, TextInput, HelperText } from "flowbite-react";
+import {
+  Datepicker,
+  START_DATE,
+} from "@datepicker-react/styled";
+import { ThemeProvider } from "styled-components";
 
 import type { FC } from "react";
 type FormData = {
   firstName: string;
   lastName: string;
   fatherName: string;
-  birthday: Date | null;
+  birthday: string;
   personalNr: string;
   email: string;
   password: string;
@@ -16,16 +21,26 @@ type FormData = {
 
 const SignUpPage: FC = () => {
   const [step, setStep] = useState(1);
+  const [state, setState] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+    focusedInput: "startDate" | "endDate" | null;
+  }>({
+    startDate: null,
+    endDate: null,
+    focusedInput: START_DATE,
+  });
 
   const {
     register,
     handleSubmit,
     getValues,
     trigger,
+    control,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      birthday: null,
+      birthday: "",
     },
   });
 
@@ -158,16 +173,61 @@ const SignUpPage: FC = () => {
                 >
                   Birthday
                 </label>
+                <ThemeProvider
+                  theme={{
+                    breakpoints: ["32em", "48em", "64em"],
+                    reactDatepicker: {
+                      daySize: [36, 40],
+                      fontFamily: "system-ui, -apple-system",
+                      colors: {
+                        accessibility: "#D80249",
+                        selectedDay: "yellow",
+                        selectedDayHover: "#F75D95",
+                        primaryColor: "#d8366f",
+                      },
+                    },
+                  }}
+                >
+                  <Controller
+                    control={control}
+                    name="birthday"
+                    rules={{
+                      required: "Birthday is required",
+                      validate: (value) => {
+                        const date = new Date(value);
+                        if (date > new Date())
+                          return "Birthday cannot be in the future";
+                        return true;
+                      },
+                    }}
+                    render={({ field }) => {
+                      const selectedDate = field.value
+                        ? new Date(field.value)
+                        : null;
 
-                <input
-                  type="date"
-                  id="birthday"
-                  {...register("birthday", {
-                    required: "Birthday is required",
-                  })}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                />
-
+                      return (
+                        <Datepicker
+                          startDate={selectedDate}
+                          endDate={null}
+                          focusedInput={state.focusedInput}
+                          maxBookingDate={new Date()}
+                          onDatesChange={({ startDate, focusedInput }) => {
+                            field.onChange(
+                              startDate
+                                ? startDate.toISOString().slice(0, 10)
+                                : ""
+                            );
+                            setState({
+                              startDate,
+                              endDate: null,
+                              focusedInput,
+                            });
+                          }}
+                        />
+                      );
+                    }}
+                  />
+                </ThemeProvider>
                 {errors.birthday && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.birthday.message}

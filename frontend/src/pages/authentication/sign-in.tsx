@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, Label, TextInput } from "flowbite-react";
+import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import type { FC } from "react";
 
 const SignInPage: FC = function () {
