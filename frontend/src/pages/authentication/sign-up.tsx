@@ -1,11 +1,8 @@
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useReducer, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Button, Label, TextInput, HelperText } from "flowbite-react";
-import {
-  Datepicker,
-  START_DATE,
-} from "@datepicker-react/styled";
-import { ThemeProvider } from "styled-components";
+import { DateSingleInput } from "@datepicker-react/styled";
+import { ThemeProvider, styled } from "styled-components";
 
 import type { FC } from "react";
 type FormData = {
@@ -21,22 +18,28 @@ type FormData = {
 
 const SignUpPage: FC = () => {
   const [step, setStep] = useState(1);
-  const [state, setState] = useState<{
-    startDate: Date | null;
-    endDate: Date | null;
-    focusedInput: "startDate" | "endDate" | null;
-  }>({
-    startDate: null,
-    endDate: null,
-    focusedInput: START_DATE,
-  });
+  const initialState = {
+    date: null,
+    showDatepicker: false,
+  };
+
+  function reducer(state: any, action: any) {
+    switch (action.type) {
+      case "focusChange":
+        return { ...state, showDatepicker: action.payload };
+      case "dateChange":
+        return action.payload;
+      default:
+        throw new Error();
+    }
+  }
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const {
     register,
     handleSubmit,
     getValues,
     trigger,
-    control,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -64,7 +67,12 @@ const SignUpPage: FC = () => {
   };
 
   const handleBack = () => setStep(1);
-
+  const DatepickerWrapper = styled.div`
+    .react-datepicker__picker {
+      position: absolute !important;
+      z-index: 9999 !important;
+    }
+  `;
   return (
     <div
       className="flex min-h-screen items-center justify-center bg-cover bg-center px-4 py-12"
@@ -173,61 +181,35 @@ const SignUpPage: FC = () => {
                 >
                   Birthday
                 </label>
-                <ThemeProvider
-                  theme={{
-                    breakpoints: ["32em", "48em", "64em"],
-                    reactDatepicker: {
-                      daySize: [36, 40],
-                      fontFamily: "system-ui, -apple-system",
-                      colors: {
-                        accessibility: "#D80249",
-                        selectedDay: "yellow",
-                        selectedDayHover: "#F75D95",
-                        primaryColor: "#d8366f",
-                      },
-                    },
-                  }}
-                >
-                  <Controller
-                    control={control}
-                    name="birthday"
-                    rules={{
-                      required: "Birthday is required",
-                      validate: (value) => {
-                        const date = new Date(value);
-                        if (date > new Date())
-                          return "Birthday cannot be in the future";
-                        return true;
+                <DatepickerWrapper>
+                  <ThemeProvider
+                    theme={{
+                      breakpoints: ["32em", "48em", "64em"],
+                      reactDatepicker: {
+                        daySize: [36, 40],
+                        fontFamily: "system-ui, -apple-system",
+                        colors: {
+                          accessibility: "#D80249",
+                          selectedDay: "yellow",
+                          selectedDayHover: "#F75D95",
+                          primaryColor: "#d8366f",
+                        },
                       },
                     }}
-                    render={({ field }) => {
-                      const selectedDate = field.value
-                        ? new Date(field.value)
-                        : null;
-
-                      return (
-                        <Datepicker
-                          startDate={selectedDate}
-                          endDate={null}
-                          focusedInput={state.focusedInput}
-                          maxBookingDate={new Date()}
-                          onDatesChange={({ startDate, focusedInput }) => {
-                            field.onChange(
-                              startDate
-                                ? startDate.toISOString().slice(0, 10)
-                                : ""
-                            );
-                            setState({
-                              startDate,
-                              endDate: null,
-                              focusedInput,
-                            });
-                          }}
-                        />
-                      );
-                    }}
-                  />
-                </ThemeProvider>
+                  >
+                    <DateSingleInput
+                      onDateChange={(data) =>
+                        dispatch({ type: "dateChange", payload: data })
+                      }
+                      onFocusChange={(focusedInput) =>
+                        dispatch({ type: "focusChange", payload: focusedInput })
+                      }
+                      date={state.date} 
+                      showDatepicker={state.showDatepicker}
+                      maxBookingDate={new Date()}
+                    />
+                  </ThemeProvider>
+                </DatepickerWrapper>
                 {errors.birthday && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.birthday.message}
