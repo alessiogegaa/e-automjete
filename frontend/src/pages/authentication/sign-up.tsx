@@ -1,18 +1,13 @@
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import {
-  Button,
-  Label,
-  TextInput,
-  HelperText,
-} from "flowbite-react";
-import type { FC } from "react";
+import { useForm } from "react-hook-form";
+import { Button, Label, TextInput, HelperText } from "flowbite-react";
 
+import type { FC } from "react";
 type FormData = {
   firstName: string;
   lastName: string;
   fatherName: string;
-  birthday: string;
+  birthday: Date | null;
   personalNr: string;
   email: string;
   password: string;
@@ -27,9 +22,12 @@ const SignUpPage: FC = () => {
     handleSubmit,
     getValues,
     trigger,
-    control,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      birthday: null,
+    },
+  });
 
   const onSubmit = async () => {
     if (step === 1) {
@@ -55,9 +53,9 @@ const SignUpPage: FC = () => {
   return (
     <div
       className="flex min-h-screen items-center justify-center bg-cover bg-center px-4 py-12"
-      style={{ backgroundImage: "url('/images/car.jpg')" }}
+      style={{ backgroundImage: "url('/images/authentication/bg-image.jpg')" }}
     >
-      <div className="w-full max-w-md bg-white/90 p-8 backdrop-blur-md dark:bg-gray-900/90">
+      <div className="w-full max-w-md bg-white/40 p-8 backdrop-blur-md dark:bg-gray-900/40">
         <div className="mb-6 text-center">
           <img
             alt="Flowbite logo"
@@ -77,12 +75,23 @@ const SignUpPage: FC = () => {
                 <TextInput
                   id="firstName"
                   color={errors.firstName ? "failure" : undefined}
-                  {...register("firstName", { required: true })}
+                  {...register("firstName", {
+                    required: "First Name is required",
+                    minLength: {
+                      value: 3,
+                      message: "First Name must be at least 3 characters",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z]+$/,
+                      message:
+                        "First Name cannot contain numbers or special characters",
+                    },
+                  })}
                 />
                 {errors.firstName && (
                   <HelperText color="failure">
-                    <span className="font-medium">Oops!</span> This field is
-                    required
+                    <span className="font-medium">Oops!</span>{" "}
+                    {errors.firstName.message}
                   </HelperText>
                 )}
               </div>
@@ -93,12 +102,23 @@ const SignUpPage: FC = () => {
                 <TextInput
                   id="fatherName"
                   color={errors.fatherName ? "failure" : undefined}
-                  {...register("fatherName", { required: true })}
+                  {...register("fatherName", {
+                    required: "Father Name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Father Name must be at least 3 characters",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z]+$/,
+                      message:
+                        "Father Name cannot contain numbers or special characters",
+                    },
+                  })}
                 />
                 {errors.fatherName && (
                   <HelperText color="failure">
-                    <span className="font-medium">Oops!</span> This field is
-                    required
+                    <span className="font-medium">Oops!</span>{" "}
+                    {errors.fatherName.message}
                   </HelperText>
                 )}
               </div>
@@ -109,12 +129,23 @@ const SignUpPage: FC = () => {
                 <TextInput
                   id="lastName"
                   color={errors.lastName ? "failure" : undefined}
-                  {...register("lastName", { required: true })}
+                  {...register("lastName", {
+                    required: "Last Name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Last Name must be at least 3 characters",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z]+$/,
+                      message:
+                        "Last Name cannot contain numbers or special characters",
+                    },
+                  })}
                 />
                 {errors.lastName && (
                   <HelperText color="failure">
-                    <span className="font-medium">Oops!</span> This field is
-                    required
+                    <span className="font-medium">Oops!</span>{" "}
+                    {errors.lastName.message}
                   </HelperText>
                 )}
               </div>
@@ -128,18 +159,13 @@ const SignUpPage: FC = () => {
                   Birthday
                 </label>
 
-                <Controller
-                  name="birthday"
-                  control={control}
-                  rules={{ required: "Birthday is required" }}
-                  render={({ field }) => (
-                    <input
-                      type="date"
-                      id="birthday"
-                      {...field}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    />
-                  )}
+                <input
+                  type="date"
+                  id="birthday"
+                  {...register("birthday", {
+                    required: "Birthday is required",
+                  })}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
 
                 {errors.birthday && (
@@ -155,12 +181,27 @@ const SignUpPage: FC = () => {
                 <TextInput
                   id="personalNr"
                   color={errors.personalNr ? "failure" : undefined}
-                  {...register("personalNr", { required: true })}
+                  {...register("personalNr", {
+                    required: "Personal Number is required",
+                    minLength: {
+                      value: 10,
+                      message: "Personal Number must be exactly 10 characters",
+                    },
+                    maxLength: {
+                      value: 10,
+                      message: "Personal Number must be exactly 10 characters",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z]\d{8}[A-Za-z]$/,
+                      message:
+                        "Personal number must start and end with a letter and have 8 digits in between",
+                    },
+                  })}
                 />
                 {errors.personalNr && (
                   <HelperText color="failure">
-                    <span className="font-medium">Oops!</span> This field is
-                    required
+                    <span className="font-medium">Oops!</span>{" "}
+                    {errors.personalNr.message}
                   </HelperText>
                 )}
               </div>
@@ -204,8 +245,12 @@ const SignUpPage: FC = () => {
                   type="password"
                   color={errors.password ? "failure" : undefined}
                   {...register("password", {
-                    required: true,
-                    minLength: { value: 6, message: "Minimum 6 characters" },
+                    required: "Password is required",
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                      message:
+                        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+                    },
                   })}
                 />
                 {errors.password && (

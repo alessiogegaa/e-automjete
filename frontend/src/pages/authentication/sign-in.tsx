@@ -6,13 +6,10 @@ const SignInPage: FC = function () {
     <div
       className="flex min-h-screen items-center justify-center bg-cover bg-center px-4 py-12"
       style={{
-        backgroundImage:
-          "url('/images/car.jpg')"
+        backgroundImage: "url('/images/authentication/bg-image.jpg')",
       }}
     >
-      <div
-        className="w-full max-w-md bg-white/90 p-8 backdrop-blur-md dark:bg-gray-900/90"
-      >
+      <div className="w-full max-w-md bg-white/40 p-8 backdrop-blur-md dark:bg-gray-900/40">
         <div className="mb-6 text-center">
           <img
             alt="Flowbite logo"
